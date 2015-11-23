@@ -94,6 +94,7 @@ jar {
 
 war {
     dependsOn check
+    baseName = 'sampleproject'
 }
 
 task wrapper(type: Wrapper) {

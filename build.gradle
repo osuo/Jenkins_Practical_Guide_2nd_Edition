@@ -17,10 +17,7 @@ sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
 group = 'jp.gihyo.jenkinsbook'
-version = '1.0.0'
-//ext {
-//    artifactId = 'sampleproject'
-//
+version = '1.0.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
@@ -33,9 +30,11 @@ publishing {
     publications {
         jar(MavenPublication) {
             from components.java
+            artifactId = 'sampleproject'
         }
         war(MavenPublication) {
             from components.web
+            artifactId = 'sampleproject'
         }
     }
     repositories {
@@ -91,16 +90,18 @@ test {
 
 jar {
     baseName = 'sampleproject'
-    version = '1.0.0'
 }
 
 war {
     dependsOn check
-    //baseName = project.ext.artifactId
-    baseName = 'sampleproject'
-    version = '1.0.0'
 }
 
 task wrapper(type: Wrapper) {
     gradleVersion = '2.2.1'
+}
+
+task debug << {
+    println project.name
+    println repositoryUser
+    println repositoryPass
 }

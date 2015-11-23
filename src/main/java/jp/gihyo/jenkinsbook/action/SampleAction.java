@@ -11,7 +11,9 @@ import jp.gihyo.jenkinsbook.dto.SampleDTO;
  * DTO class for SampleServlet.
  */
 public class SampleAction {
-    //
+    /**
+     * 12時を示す定数.
+     */
     private static final int HOUR_12 = 12;
     /**
      * First name of the user.

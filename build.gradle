@@ -12,6 +12,8 @@ apply plugin: 'findbugs'
 apply plugin: 'jacoco'
 apply plugin: 'war'
 apply plugin: 'maven-publish'
+apply plugin: 'eclipse'
+apply plugin: 'eclipse-wtp'
 
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8

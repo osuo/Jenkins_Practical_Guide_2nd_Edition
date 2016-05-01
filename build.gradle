@@ -1,19 +1,14 @@
-//plugins {
-    //id 'java'
-    //id 'checkstyle'
-    //id 'findbugs'
-    //id 'jacoco'
-    //id 'war'
-//}
-
-apply plugin: 'java'
-apply plugin: 'checkstyle'
-apply plugin: 'findbugs'
-apply plugin: 'jacoco'
-apply plugin: 'war'
-apply plugin: 'maven-publish'
-apply plugin: 'eclipse'
-apply plugin: 'eclipse-wtp'
+plugins {
+    id 'java'
+    id 'checkstyle'
+    id 'findbugs'
+    id 'jacoco'
+    id 'war'
+    id 'maven-publish'
+    id 'eclipse'
+    id 'eclipse-wtp'
+    id 'org.sonarqube' version '2.0.1'
+}
 
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
@@ -39,6 +34,8 @@ publishing {
             artifactId = 'sampleproject'
         }
     }
+    // ~/.gradle/gradle.properties
+    // reporisotyUser, repositoryPass
     repositories {
         maven {
             name "releases"
@@ -60,10 +57,10 @@ publishing {
 }
 
 dependencies {
-    providedCompile 'javax.servlet:javax.servlet-api:3.1.0',
-                    'javax.servlet.jsp:javax.servlet.jsp-api:2.3.1'
-    testCompile 'junit:junit:4.11',
-                'org.easymock:easymock:3.2'
+    providedCompile 'javax.servlet:javax.servlet-api:3.1.0'
+    providedCompile 'javax.servlet.jsp:javax.servlet.jsp-api:2.3.1'
+    testCompile 'junit:junit:4.11'
+    testCompile 'org.easymock:easymock:3.2'
 }
 
 checkstyleMain {
@@ -106,3 +103,13 @@ task debug << {
     println repositoryUser
     println repositoryPass
 }
+
+// ~/.gradle/gradle.properties
+// systemProp.sonar.host.url, systemProp.sonar.login, systemProp.sonar.password
+sonarqube {
+    properties {
+        //property "sonar.host.url", "http://nexus.hagi.home:8000/"
+        //property "sonar.jacoco.reportPath", "${project.buildDir}/jacoco/test.exec"
+    }
+}
+

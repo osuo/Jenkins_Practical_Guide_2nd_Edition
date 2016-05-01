@@ -22,9 +22,9 @@ group = 'jp.gihyo.jenkinsbook'
 version = '1.0.0-SNAPSHOT'
 
 repositories {
-    mavenCentral()
+    //mavenCentral()
     maven {
-        url "http://nexus.dev.hoge.org:8000/content/groups/public"
+        url "http://nexus.hagi.home:8000/content/groups/public"
     }
 }
 
@@ -42,7 +42,7 @@ publishing {
     repositories {
         maven {
             name "releases"
-            url "http://nexus.dev.hoge.org:8000/content/repositories/releases"
+            url "http://nexus.hoge.home:8000/content/repositories/releases"
             credentials {
                 username repositoryUser
                 password repositoryPass
@@ -50,7 +50,7 @@ publishing {
         }
         maven {
             name "snapshots"
-            url "http://nexus.dev.hoge.org:8000/content/repositories/snapshots"
+            url "http://nexus.hoge.home:8000/content/repositories/snapshots"
             credentials {
                 username repositoryUser
                 password repositoryPass
@@ -64,8 +64,6 @@ dependencies {
                     'javax.servlet.jsp:javax.servlet.jsp-api:2.3.1'
     testCompile 'junit:junit:4.11',
                 'org.easymock:easymock:3.2'
-    checkstyle 'com.puppycrawl.tools:checkstyle:5.5'
-    findbugs 'com.google.code.findbugs:findbugs:3.0.0'
 }
 
 checkstyleMain {

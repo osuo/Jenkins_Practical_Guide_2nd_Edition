@@ -59,8 +59,8 @@ publishing {
 dependencies {
     providedCompile 'javax.servlet:javax.servlet-api:3.1.0'
     providedCompile 'javax.servlet.jsp:javax.servlet.jsp-api:2.3.1'
-    testCompile 'junit:junit:4.11'
-    testCompile 'org.easymock:easymock:3.2'
+    testCompile 'junit:junit:4.12'
+    testCompile 'org.easymock:easymock:3.4'
 }
 
 checkstyleMain {
@@ -85,6 +85,10 @@ test {
     ignoreFailures = true
 }
 
+jacoco {
+    toolVersion = '0.7.6.201602180812'
+}
+
 jar {
     baseName = 'sampleproject'
 }
@@ -95,7 +99,7 @@ war {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.2.1'
+    gradleVersion = '2.12'
 }
 
 task debug << {

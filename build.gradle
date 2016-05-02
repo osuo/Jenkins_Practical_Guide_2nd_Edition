@@ -9,6 +9,7 @@ plugins {
     id 'eclipse-wtp'
     id 'org.sonarqube' version '2.0.1'
     id 'jetty'
+    id 'com.bmuschko.tomcat-base' version '2.2.4'
 }
 
 sourceCompatibility = JavaVersion.VERSION_1_8
@@ -63,34 +64,36 @@ dependencies {
     testCompile 'junit:junit:4.12'
     testCompile 'org.easymock:easymock:3.4'
     testCompile 'org.seleniumhq.selenium:selenium-java:2.53.0'
+    
+    //checkstyle fileTree(dir: 'libs/checkstyle/', include: '*.jar')
+    
+    def tomcatVersion = '7.0.69'
+    tomcat "org.apache.tomcat.embed:tomcat-embed-core:${tomcatVersion}",
+           "org.apache.tomcat.embed:tomcat-embed-logging-juli:${tomcatVersion}",
+           "org.apache.tomcat.embed:tomcat-embed-jasper:${tomcatVersion}"
+//    tomcat("org.apache.tomcat.embed:tomcat-embed-jasper:${tomcatVersion}") {
+//        exclude group: 'org.eclipse.jdt.core.compiler', module: 'ecj'
+//    }
+    
 }
 
-checkstyleMain {
-    configFile = file('./config/checkstyle/sun_checks.xml')
+checkstyle {
+    toolVersion = 6.18
+    //configFile = file('config/checkstyle/checkstyle_checks.xml')
+    //configProperties = ['checkstyle.suppressions.file':'config/checkstyle/suppressions.xml']
+    //configFile = file('config/checkstyle/sun_checks.xml')
+    configFile = file('config/checkstyle/google_checks.xml')
     ignoreFailures = true
 }
 
-checkstyleTest {
-    configFile = file('./config/checkstyle/sun_checks.xml')
-    excludes = ['**/*']
+findbugs {
+    ignoreFailures = true
 }
-
-//findbugsMain {
-//    ignoreFailures = true
-//}
-
-//findbugsTest {
-//    ignoreFailures = true
-//}
-//tasks.withType(FindBugs) {
-//    reports {
-//        xml.enabled false
-//        html.enabled true
-//    }
-//}
 
 test {
     ignoreFailures = true
+    reports.html.destination = file("${reports.html.destination}/unit")
+    reports.junitXml.destination = file("${reports.junitXml.destination}/unit")
 }
 
 jacoco {
@@ -125,3 +128,38 @@ sonarqube {
     }
 }
 
+sourceSets {
+    functionalTest {
+        java.srcDir file('src/functionalTest/java')
+        resources.srcDir file('src/functionalTest/resources')
+        compileClasspath = sourceSets.main.output + configurations.testCompile
+        runtimeClasspath = output + compileClasspath + configurations.testRuntime
+    }
+}
+
+ext {
+    tomcatStopPort = 8081;
+    tomcatStopKey = 'stopKey'
+}
+
+task tomcatRun4FunctionalTest(type: com.bmuschko.gradle.tomcat.tasks.TomcatRunWar) {
+    stopPort = tomcatStopPort
+    stopKey = tomcatStopKey
+    daemon = true
+}
+
+task tomcatStop4FunctionalTest(type: com.bmuschko.gradle.tomcat.tasks.TomcatStop) {
+    stopPort = tomcatStopPort
+    stopKey = tomcatStopKey
+}
+
+task functionalTest(type: Test) {
+    testClassesDir = sourceSets.functionalTest.output.classesDir
+    classpath = sourceSets.functionalTest.runtimeClasspath
+    reports.html.destination = file("${reports.html.destination}/functional")
+    reports.junitXml.destination = file("${reports.junitXml.destination}/functional")
+    group = 'verification'
+    
+    dependsOn tomcatRun4FunctionalTest
+    finalizedBy tomcatStop4FunctionalTest
+}

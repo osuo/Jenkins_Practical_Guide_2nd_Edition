@@ -1,7 +1,7 @@
 plugins {
     id 'java'
-    id 'checkstyle'
-    id 'findbugs'
+    id 'checkstyle'// Gradleのコアプラグインなので、ここにバージョンは指定できない! version '6.18'
+    id 'findbugs'// Gradleのコアプラグイン version '3.0.1'
     id 'jacoco'
     id 'war'
     id 'maven-publish'
@@ -78,7 +78,7 @@ dependencies {
 }
 
 checkstyle {
-    toolVersion = 6.18
+    toolVersion = '6.18'
     //configFile = file('config/checkstyle/checkstyle_checks.xml')
     //configProperties = ['checkstyle.suppressions.file':'config/checkstyle/suppressions.xml']
     //configFile = file('config/checkstyle/sun_checks.xml')
@@ -87,6 +87,7 @@ checkstyle {
 }
 
 findbugs {
+    toolVersion = '3.0.1'
     ignoreFailures = true
 }
 

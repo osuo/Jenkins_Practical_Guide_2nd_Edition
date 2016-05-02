@@ -3,6 +3,7 @@ package jp.gihyo.jenkinsbook.webdriver;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.Calendar;
 import java.util.Properties;
 
@@ -13,6 +14,8 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -23,19 +26,20 @@ public class SampleTestCase {
 	
 	@BeforeClass
 	public static void setUpClass() throws IOException {
-		// prop.load(SampleTestCase.class.getResourceAsStream("/selenium.properties"));
-		prop.setProperty("baseUrl", "http://localhost:8080"); // TODO とりあえず
-		driver = new FirefoxDriver();
+		prop.load(SampleTestCase.class.getResourceAsStream("/selenium.properties"));
+		// driver = new FirefoxDriver();
+        DesiredCapabilities capability = DesiredCapabilities.firefox();
+        // capability.setVersion("26.0");
+        driver = new RemoteWebDriver(new URL(prop.getProperty("seleniumGridUrl")), capability);
 	}
 	
 	@AfterClass
 	public static void tearDownClass() throws IOException {
 		driver.quit();
 	}
-	
 	@Test
 	public void testNormal01() {
-		driver.get(prop.getProperty("baseUrl") + "/sampleproject");
+		driver.get(prop.getProperty("baseUrl"));
 		
 		TopPage topPage = new TopPage(driver);
 		assertEquals("名字", topPage.getLastNameLabel());
@@ -48,7 +52,7 @@ public class SampleTestCase {
 	
 	@Test
 	public void testNormal02() {
-		driver.get(prop.getProperty("baseUrl") + "/sampleproject");
+		driver.get(prop.getProperty("baseUrl"));
 		
 		TopPage topPage = new TopPage(driver);
 		topPage.setLastName("Hoge");
@@ -69,7 +73,7 @@ public class SampleTestCase {
 	
 	@Test
 	public void testError01() {
-		driver.get(prop.getProperty("baseUrl") + "/sampleproject");
+		driver.get(prop.getProperty("baseUrl"));
 		
 		TopPage page = new TopPage(driver);
 		page.setFirstName("Hoge");
@@ -81,7 +85,7 @@ public class SampleTestCase {
 
 	@Test
 	public void testError02() {
-		driver.get(prop.getProperty("baseUrl") + "/sampleproject");
+		driver.get(prop.getProperty("baseUrl"));
 		
 		TopPage page = new TopPage(driver);
 		page.setLastName("Hoge");

@@ -73,13 +73,19 @@ checkstyleTest {
     excludes = ['**/*']
 }
 
-findbugsMain {
-    ignoreFailures = true
-}
+//findbugsMain {
+//    ignoreFailures = true
+//}
 
-findbugsTest {
-    ignoreFailures = true
-}
+//findbugsTest {
+//    ignoreFailures = true
+//}
+//tasks.withType(FindBugs) {
+//    reports {
+//        xml.enabled false
+//        html.enabled true
+//    }
+//}
 
 test {
     ignoreFailures = true

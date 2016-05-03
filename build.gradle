@@ -194,7 +194,7 @@ task functionalTest4LocalTomcat(type: Test) {
     finalizedBy tomcatStop4FunctionalTest
 }
 
-task functionalTest4RemotoTomcat(type: Test) {
+task functionalTest4RemoteTomcat(type: Test) {
     testClassesDir = sourceSets.functionalTest.output.classesDir
     classpath = sourceSets.functionalTest.runtimeClasspath
     reports.html.destination = file("${reports.html.destination}/functional")

@@ -11,6 +11,7 @@ plugins {
     id 'org.sonarqube' version '2.0.1'
     id 'jetty'
     id 'com.bmuschko.tomcat-base' version '2.2.4'
+    id 'com.bmuschko.cargo' version '2.2.2'
 }
 
 // Javaプラグイン用
@@ -66,6 +67,7 @@ publishing {
 dependencies {
     providedCompile 'javax.servlet:javax.servlet-api:3.1.0'
     providedCompile 'javax.servlet.jsp:javax.servlet.jsp-api:2.3.1'
+    
     testCompile 'junit:junit:4.12'
     testCompile 'org.easymock:easymock:3.4'
     testCompile 'org.seleniumhq.selenium:selenium-java:2.53.0'
@@ -79,7 +81,10 @@ dependencies {
 //    tomcat("org.apache.tomcat.embed:tomcat-embed-jasper:${tomcatVersion}") {
 //        exclude group: 'org.eclipse.jdt.core.compiler', module: 'ecj'
 //    }
-    
+
+    def cargoVersion = '1.4.19'
+    cargo "org.codehaus.cargo:cargo-core-uberjar:$cargoVersion",
+          "org.codehaus.cargo:cargo-ant:$cargoVersion"    
 }
 
 // ソースセットの設定
@@ -95,9 +100,8 @@ sourceSets {
 
 // エクストラプロパティの設定
 ext {
-    //project.hasProperty('hogehoge') ? hogehoge : 'none!'
     tomcatHttpHost = project.hasProperty('tomcatHttpHost') ? tomcatHttpHost : 'localhost'
-    tomcatHttpPort = 18080;
+    tomcatHttpPort = project.hasProperty('tomcatHttpPort') ? tomcatHttpPort as int: 18080;
     tomcatStopPort = 18081;
     tomcatStopKey = 'stopKey'
 }
@@ -148,6 +152,21 @@ war {
     baseName = 'sampleproject'
 }
 
+cargo {
+    containerId = 'tomcat8x'
+    port = 8000
+    
+    deployable {
+        context = 'sampleproject'
+    }
+    
+    remote {
+        hostname = 'tomcat.hagi.home'
+        username = 'tomcat'
+        password = 'tomcat'
+    }
+ }
+
 task wrapper(type: Wrapper) {
     gradleVersion = '2.12'
 }
@@ -164,7 +183,7 @@ task tomcatStop4FunctionalTest(type: com.bmuschko.gradle.tomcat.tasks.TomcatStop
     stopKey = tomcatStopKey
 }
 
-task functionalTest(type: Test) {
+task functionalTest4LocalTomcat(type: Test) {
     testClassesDir = sourceSets.functionalTest.output.classesDir
     classpath = sourceSets.functionalTest.runtimeClasspath
     reports.html.destination = file("${reports.html.destination}/functional")
@@ -173,6 +192,14 @@ task functionalTest(type: Test) {
     
     dependsOn tomcatRun4FunctionalTest
     finalizedBy tomcatStop4FunctionalTest
+}
+
+task functionalTest4RemotoTomcat(type: Test) {
+    testClassesDir = sourceSets.functionalTest.output.classesDir
+    classpath = sourceSets.functionalTest.runtimeClasspath
+    reports.html.destination = file("${reports.html.destination}/functional")
+    reports.junitXml.destination = file("${reports.junitXml.destination}/functional")
+    group = 'verification'
 }
 
 task debugs << {

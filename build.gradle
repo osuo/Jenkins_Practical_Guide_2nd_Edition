@@ -1,3 +1,4 @@
+// 使用するプラグイン
 plugins {
     id 'java'
     id 'checkstyle'// Gradleのコアプラグインなので、ここにバージョンは指定できない! version '6.18'
@@ -12,12 +13,14 @@ plugins {
     id 'com.bmuschko.tomcat-base' version '2.2.4'
 }
 
+// Javaプラグイン用
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
 group = 'jp.gihyo.jenkinsbook'
 version = '1.0.0-SNAPSHOT'
 
+// ライブラリ参照に使うリポジトリの設定
 repositories {
     //mavenCentral()
     maven {
@@ -25,6 +28,7 @@ repositories {
     }
 }
 
+// 成果物の公開先の設定
 publishing {
     publications {
         jar(MavenPublication) {
@@ -58,6 +62,7 @@ publishing {
     }
 }
 
+// 依存関係の設定
 dependencies {
     providedCompile 'javax.servlet:javax.servlet-api:3.1.0'
     providedCompile 'javax.servlet.jsp:javax.servlet.jsp-api:2.3.1'
@@ -67,7 +72,7 @@ dependencies {
     
     //checkstyle fileTree(dir: 'libs/checkstyle/', include: '*.jar')
     
-    def tomcatVersion = '7.0.69'
+    def tomcatVersion = '8.0.33'
     tomcat "org.apache.tomcat.embed:tomcat-embed-core:${tomcatVersion}",
            "org.apache.tomcat.embed:tomcat-embed-logging-juli:${tomcatVersion}",
            "org.apache.tomcat.embed:tomcat-embed-jasper:${tomcatVersion}"
@@ -75,6 +80,23 @@ dependencies {
 //        exclude group: 'org.eclipse.jdt.core.compiler', module: 'ecj'
 //    }
     
+}
+
+// ソースセットの設定
+sourceSets {
+    // 機能テスト用（Seleniumでのテストを想定)
+    functionalTest {
+        java.srcDir file('src/functionalTest/java')
+        resources.srcDir file('src/functionalTest/resources')
+        compileClasspath = sourceSets.main.output + configurations.testCompile
+        runtimeClasspath = output + compileClasspath + configurations.testRuntime
+    }
+}
+
+// エクストラプロパティの設定
+ext {
+    tomcatStopPort = 8081;
+    tomcatStopKey = 'stopKey'
 }
 
 checkstyle {
@@ -101,6 +123,15 @@ jacoco {
     toolVersion = '0.7.6.201602180812'
 }
 
+// ~/.gradle/gradle.properties
+// systemProp.sonar.host.url, systemProp.sonar.login, systemProp.sonar.password
+sonarqube {
+    properties {
+        //property "sonar.host.url", "http://nexus.hagi.home:8000/"
+        //property "sonar.jacoco.reportPath", "${project.buildDir}/jacoco/test.exec"
+    }
+}
+
 jar {
     baseName = 'sampleproject'
 }
@@ -114,34 +145,6 @@ task wrapper(type: Wrapper) {
     gradleVersion = '2.12'
 }
 
-task debug << {
-    println project.name
-    println repositoryUser
-    println repositoryPass
-}
-
-// ~/.gradle/gradle.properties
-// systemProp.sonar.host.url, systemProp.sonar.login, systemProp.sonar.password
-sonarqube {
-    properties {
-        //property "sonar.host.url", "http://nexus.hagi.home:8000/"
-        //property "sonar.jacoco.reportPath", "${project.buildDir}/jacoco/test.exec"
-    }
-}
-
-sourceSets {
-    functionalTest {
-        java.srcDir file('src/functionalTest/java')
-        resources.srcDir file('src/functionalTest/resources')
-        compileClasspath = sourceSets.main.output + configurations.testCompile
-        runtimeClasspath = output + compileClasspath + configurations.testRuntime
-    }
-}
-
-ext {
-    tomcatStopPort = 8081;
-    tomcatStopKey = 'stopKey'
-}
 
 task tomcatRun4FunctionalTest(type: com.bmuschko.gradle.tomcat.tasks.TomcatRunWar) {
     stopPort = tomcatStopPort

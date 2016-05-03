@@ -95,8 +95,15 @@ sourceSets {
 
 // エクストラプロパティの設定
 ext {
-    tomcatStopPort = 8081;
+    //project.hasProperty('hogehoge') ? hogehoge : 'none!'
+    tomcatHttpHost = project.hasProperty('tomcatHttpHost') ? tomcatHttpHost : 'localhost'
+    tomcatHttpPort = 18080;
+    tomcatStopPort = 18081;
     tomcatStopKey = 'stopKey'
+}
+
+processFunctionalTestResources {
+    expand baseUrl:"http://$tomcatHttpHost:$tomcatHttpPort/sampleproject"
 }
 
 checkstyle {
@@ -145,8 +152,8 @@ task wrapper(type: Wrapper) {
     gradleVersion = '2.12'
 }
 
-
 task tomcatRun4FunctionalTest(type: com.bmuschko.gradle.tomcat.tasks.TomcatRunWar) {
+    httpPort = tomcatHttpPort
     stopPort = tomcatStopPort
     stopKey = tomcatStopKey
     daemon = true
@@ -166,4 +173,10 @@ task functionalTest(type: Test) {
     
     dependsOn tomcatRun4FunctionalTest
     finalizedBy tomcatStop4FunctionalTest
+}
+
+task debugs << {
+    def abc = project.hasProperty('hogehoge') ? hogehoge : 'none!'
+    println abc
+    println project.name
 }

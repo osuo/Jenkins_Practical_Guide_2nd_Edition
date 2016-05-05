@@ -12,13 +12,14 @@ import jp.gihyo.jenkinsbook.page.TopPage;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
-import org.openqa.selenium.firefox.FirefoxDriver;
+//import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 
+@Ignore
 public class SampleTestCase {
 
 	private static Properties prop = new Properties();

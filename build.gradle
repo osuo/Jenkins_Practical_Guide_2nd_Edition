@@ -12,6 +12,7 @@ plugins {
     id 'jetty'
     id 'com.bmuschko.tomcat-base' version '2.2.4'
     id 'com.bmuschko.cargo' version '2.2.2'
+    id 'groovy'
 }
 
 // Javaプラグイン用
@@ -63,6 +64,18 @@ publishing {
     }
 }
 
+// ソースセットの設定
+sourceSets {
+    // 機能テスト用（Seleniumでのテストを想定)
+    functionalTest {
+        //java.srcDir file('src/functionalTest/java')
+        //groovy.srcDir file('src/functionalTest/groovy')
+        //resources.srcDir file('src/functionalTest/resources')
+        compileClasspath = sourceSets.main.output + configurations.testCompile + configurations.functionalTestCompile
+        runtimeClasspath = output + compileClasspath + configurations.testRuntime + configurations.functionalTestRuntime
+    }
+}
+
 // 依存関係の設定
 dependencies {
     providedCompile 'javax.servlet:javax.servlet-api:3.1.0'
@@ -70,8 +83,15 @@ dependencies {
     
     testCompile 'junit:junit:4.12'
     testCompile 'org.easymock:easymock:3.4'
+    testCompile 'org.codehaus.groovy:groovy-all:2.4.6'
+    testCompile 'org.spockframework:spock-core:1.0-groovy-2.4'
+
     testCompile 'org.seleniumhq.selenium:selenium-java:2.53.0'
-    
+    testCompile 'org.gebish:geb-spock:0.13.1'
+
+    //functionalTestCompile 'org.seleniumhq.selenium:selenium-java:2.53.0' // sourcesSetsでfunctionalTestを定義した後じゃないとダメ
+    //functionalTestCompile 'org.gebish:geb-spock:0.13.1'
+
     //checkstyle fileTree(dir: 'libs/checkstyle/', include: '*.jar')
     
     def tomcatVersion = '8.0.33'
@@ -85,17 +105,6 @@ dependencies {
     def cargoVersion = '1.4.19'
     cargo "org.codehaus.cargo:cargo-core-uberjar:$cargoVersion",
           "org.codehaus.cargo:cargo-ant:$cargoVersion"    
-}
-
-// ソースセットの設定
-sourceSets {
-    // 機能テスト用（Seleniumでのテストを想定)
-    functionalTest {
-        java.srcDir file('src/functionalTest/java')
-        resources.srcDir file('src/functionalTest/resources')
-        compileClasspath = sourceSets.main.output + configurations.testCompile
-        runtimeClasspath = output + compileClasspath + configurations.testRuntime
-    }
 }
 
 // エクストラプロパティの設定
@@ -194,7 +203,8 @@ task functionalTest4LocalTomcat(type: Test) {
     finalizedBy tomcatStop4FunctionalTest
 }
 
-task functionalTest4RemoteTomcat(type: Test) {
+task functionalTest(type: Test) {
+    ignoreFailures = true
     testClassesDir = sourceSets.functionalTest.output.classesDir
     classpath = sourceSets.functionalTest.runtimeClasspath
     reports.html.destination = file("${reports.html.destination}/functional")
@@ -202,8 +212,33 @@ task functionalTest4RemoteTomcat(type: Test) {
     group = 'verification'
 }
 
+task functionalTest4RemoteTomcat(type: Test) {
+    ignoreFailures = true
+    testClassesDir = sourceSets.functionalTest.output.classesDir
+    classpath = sourceSets.functionalTest.runtimeClasspath
+    reports.html.destination = file("${reports.html.destination}/functional")
+    reports.junitXml.destination = file("${reports.junitXml.destination}/functional")
+    group = 'verification'
+
+    // コマンドラインで-Dgeb.env=remoteを指定するもうまくいかない。。。
+    // なので、改めて指定する
+    // systemProperty 'geb.env', System.properties['geb.env']
+
+    // 直接指定
+    systemProperty 'geb.env', 'remote'
+}
+
+
 task debugs << {
     def abc = project.hasProperty('hogehoge') ? hogehoge : 'none!'
     println abc
     println project.name
+
+    println System.properties['geb.env']
+
+    println sourceSets
+    println 'functionalTest.compileClasspath--------------------------'
+    sourceSets.functionalTest.compileClasspath.each{println it}
+//    println 'functionalTest.runtimeClasspath--------------------------'
+//    sourceSets.functionalTest.runtimeClasspath.each{println it}
 }
